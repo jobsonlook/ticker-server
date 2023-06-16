@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/golang/glog"
+	"ticker-server/config"
 	"ticker-server/handler"
 	"time"
 )
@@ -26,12 +27,12 @@ func StartServer() {
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()
 	r.Use(LoggerToFile())
-	apiPrefix := "/api"
+	apiPrefix := "/"
 	g := r.Group(apiPrefix)
 
 	coinHandler := handler.NewCoinHandler()
 
 	g.GET("/price/:currency", coinHandler.GetPrice)
 
-	r.Run(":12306")
+	r.Run(":" + config.Config().Server.Port)
 }

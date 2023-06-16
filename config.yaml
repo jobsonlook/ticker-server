@@ -3,14 +3,4 @@ Server:
   Port: 10861
   ReadTimeout: 60
   WriteTimeout: 60
-Mysql:
-  Host:
-  Port: 63450
-  User: root
-  Pwd: a#654321B
-  DBName: asd_swap
-  MaxOpenConns: 100
-  MaxIdleConns: 15
-  MaxLifetimeSeconds: 60
-  ShowSQL: false
-  LogLevel: DEBUG
+

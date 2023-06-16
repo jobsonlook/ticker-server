@@ -1,7 +1,9 @@
 package main
 
 import (
+	"flag"
 	"github.com/golang/glog"
+	"ticker-server/config"
 	"ticker-server/server"
 	"time"
 )
@@ -24,9 +26,9 @@ var (
 )
 
 func init() {
-	//flag.StringVar(&ConfigURL, "config", "./config.yaml", "config url")
-	//flag.Parse()
-	//config.InitConfig(ConfigURL)
+	flag.StringVar(&ConfigURL, "config", "./config.yaml", "config url")
+	flag.Parse()
+	config.InitConfig(ConfigURL)
 }
 
 // go run main.go -alsologtostderr
