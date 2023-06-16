@@ -7,11 +7,13 @@ import (
 	"github.com/golang/glog"
 	"io/ioutil"
 	"net/http"
+	"sync"
 	"ticker-server/dto"
 	"time"
 )
 
 type CoinHandler struct {
+	lock     sync.RWMutex
 	priceMap map[string]*CoinInfo
 }
 
@@ -26,6 +28,7 @@ type CoinInfo struct {
 func NewCoinHandler() *CoinHandler {
 
 	return &CoinHandler{
+		lock:     sync.RWMutex{},
 		priceMap: make(map[string]*CoinInfo, 0),
 	}
 }
@@ -64,6 +67,7 @@ func (oh *CoinHandler) GetPrice(c *gin.Context) {
 		return
 	}
 	isQuery := false
+	oh.lock.RLock()
 	if _, ok := oh.priceMap[currency]; ok {
 		coin := oh.priceMap[currency]
 		now := time.Now()
@@ -73,6 +77,8 @@ func (oh *CoinHandler) GetPrice(c *gin.Context) {
 	} else {
 		isQuery = true
 	}
+	oh.lock.RUnlock()
+
 	if isQuery {
 		resp, err := HttpGet("https://rest.coinapi.io/v1/exchangerate/" + currency + "/USD")
 		if err != nil {
@@ -85,8 +91,10 @@ func (oh *CoinHandler) GetPrice(c *gin.Context) {
 			reErr = errors.New("json  is error")
 			return
 		}
+		oh.lock.Lock()
 		oh.priceMap[currency] = &data
 		oh.priceMap[currency].QueryTime = time.Now()
+		oh.lock.Unlock()
 	}
 	glog.Info("isQuery api:", isQuery, ",resp:", oh.priceMap[currency].Rate)
 	res.Rate = oh.priceMap[currency].Rate
